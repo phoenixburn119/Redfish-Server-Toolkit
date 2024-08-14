@@ -1,0 +1,5 @@
+*.csv
+*.txt
+*.db
+Test.py
+\__pycache__

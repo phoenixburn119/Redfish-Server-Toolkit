@@ -52,15 +52,27 @@ def Create_Database_Tables():
     else:
         return("Database Already Exists")
 
-def Get_DiskDatabase():
+def Get_DiskDatabase(SearchMethod):
     SQLfilename = os.path.join((os.path.dirname(__file__)), 'RedDataBase.db')
     database = sqlite3.connect(SQLfilename)
     # cursor = database.cursor()
-    for row in database.execute("SELECT * FROM HostDisks ORDER BY DateEntryAdded DESC"):
-        print(row)
+    print(type(SearchMethod))
+    if(SearchMethod == 'Full'):
+        for row in database.execute("SELECT * FROM HostDisks ORDER BY DateEntryAdded DESC"):
+            print(row)
+        # Query = database.execute("SELECT * FROM HostDisks ORDER BY DateEntryAdded DESC")
+        database.close()
+    elif(SearchMethod == 'Hosts'):
+        for row in database.execute("SELECT ID, DateEntryAdded, Hostname, HealthStatus FROM HostDisks ORDER BY DateEntryAdded DESC"):
+            print(row)
+        database.close()
+    else:
+        Query = database.execute("SELECT * FROM HostDisks ORDER BY DateEntryAdded DESC")
+        database.close()
+        return(Query)
         
     # for row in database.execute("SELECT ID, Hostname, DriveID, Healthstatus FROM HostDisks ORDER BY DateEntryAdded DESC"):
     #     print(row)
     # for row in database.execute("SELECT ID, Hostname, DriveID, Healthstatus FROM HostDisks WHERE DriveID='5' AND ID='6'"):
     #     print(row)
-    database.close()
+    

@@ -24,8 +24,11 @@ class DBClient:
         InsertData = (Hostname, (DiskData['Id']), (DiskData['SerialNumber']), (DiskData['Model']), (DiskData['Status']['Health']), (DiskData['CapacityGB']), (DiskData['CurrentTemperatureCelsius']), (DiskData['MaximumTemperatureCelsius']), (DiskData['Description']), (''.join(str(x) for x in DiskData['DiskDriveStatusReasons'])), (DiskData['FirmwareVersion']['Current']['VersionString']), (DiskData['InterfaceSpeedMbps']), (DiskData['InterfaceType']), (DiskData['Location']), (DiskData['MediaType']), (DiskData['PowerOnHours']), (DiskData['RotationalSpeedRpm']), (DiskData['UncorrectedReadErrors']), (DiskData['UncorrectedWriteErrors']))
         self.cursor.execute("INSERT INTO HostDisks(DateEntryAdded, Hostname, DriveID, SerialNumber, Model, HealthStatus, CapacityGB, CurrentTemperatureCelsius, MaximumTemperatureCelsius, Description, DiskDriveStatusReasons, FirmwareVersion, InterfaceSpeedMbps, InterfaceType, Location, MediaType, PowerOnHours, RotationalSpeedRpm, UncorrectedReadErrors, UncorrectedWriteErrors) VALUES (CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", InsertData)
         self.DBConnection.commit()
+        
+    def Write_SysInfo(self):
+        pass
     
-    def Get_DiskDatabase2(self, SearchMethod: str) -> str:
+    def Get_DiskDatabase(self, SearchMethod: str) -> str:
         # cursor = database.cursor()
         print(type(SearchMethod))
         if(SearchMethod == 'Full'):
@@ -36,7 +39,14 @@ class DBClient:
             for row in self.DBConnection.execute("SELECT ID, DateEntryAdded, Hostname, HealthStatus FROM HostDisks ORDER BY DateEntryAdded DESC"):
                 print(row)
         else:
-            Query = self.DBConnection.execute("SELECT * FROM HostDisks ORDER BY DateEntryAdded DESC")
+            Query = self.DBConnection.execute("SELECT  FROM HostDisks")
             return(Query)
+        
+    def Get_DiskByID(self, DiskID: str) -> str:
+        for row in self.DBConnection.execute("SELECT * FROM HostDisks WHERE DriveID=?", DiskID):
+            print(row)
+            
+        self.cursor.execute("SELECT * FROM HostDisks WHERE DriveID=?", DiskID)
+        print(self.cursor.fetchall())
         
     

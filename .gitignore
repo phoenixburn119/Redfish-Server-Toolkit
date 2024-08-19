@@ -2,4 +2,5 @@
 *.txt
 *.db
 Test.py
+\SupportFunctions.py
 \__pycache__

@@ -19,7 +19,7 @@ class RFClient:
             ControllerList = (self.RFConnection.get("/redfish/v1/Systems/1/Storage/").dict)['Members']
             for Controller in ControllerList:
                 ControllerData = self.RFConnection.get((Controller['@odata.id'])).dict
-                DisksData = (self.RFConnection.get(ControllerData['Links']['PhysicalDrives']['@odata.id']).dict)['Members']
+                DisksData = (ControllerData['Drives'])
                 for Disks in DisksData:
                     DiskData = self.RFConnection.get(Disks['@odata.id']).dict
                     DataBaseClient.Write_DiskDatabase(DiskData, Hostname)

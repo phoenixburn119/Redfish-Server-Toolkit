@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 
 class TKClient:
     tk_root = None
@@ -12,18 +13,19 @@ class TKClient:
         pass
 
     def MainFrames(self):
-        self.frame_main = tk.Frame(self.tk_root)
+        self.frame_main = ttk.Frame(self.tk_root)
         
-        self.frame_host = tk.Frame(self.tk_root)
+        self.frame_host = ttk.Frame(self.tk_root)
         self.frame_host.columnconfigure(0, weight=1)
+        self.frame_host.columnconfigure(1, weight=1)
         self.frame_host.grid(row=0,column=0, sticky="ew")
         self.Host_Frame()
         
-        self.frame_query = tk.Frame(self.tk_root)
+        self.frame_query = ttk.Frame(self.tk_root)
         
     def test(self):
         pass
     
     def Host_Frame(self):
-        submit_button = tk.Button(self.frame_host, text="Submit")
+        submit_button = ttk.Button(self.frame_host, text="Search")
         submit_button.grid(row=0,column=0)

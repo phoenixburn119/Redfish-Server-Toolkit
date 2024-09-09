@@ -21,10 +21,12 @@ def Main():
     for i in range(ILOSheet.iloc[:,1].count()):
         if(ILOSheet.iloc[i,2] != "IP"):
             FClient = RFClient(ILOSheet.iloc[i,3], ILOSheet.iloc[i,4], ILOSheet.iloc[i,2])
-            # FClient.Gather_HostDisks(ILOSheet.iloc[i,0])
-            FClient.Gather_Summary()
-
-
+            FClient.Gather_HostDisks(ILOSheet.iloc[i,0])
+            
+    # print(DClient.Get_DiskDatabase('Full'))
+    temp = DClient.Get_DiskByID('0')
+    for t in temp:
+        print(t)
 
 
 def MainTesting():
@@ -41,13 +43,16 @@ def MainTesting():
     #         HostList.append(ILOSheet.iloc[i,0])
     # DClient.Cleanup_Database_Tables(HostList)
 
-
     UIClient = TKClient()
     UIClient.tk_root.mainloop()
+    
+    # FClient = RFClient()
+    # FClient.Gather_HostDisks()
+    pass
 
 
 
 if __name__ == "__main__":
-    Main()
-    # MainTesting()
+    # Main()
+    MainTesting()
     # pass

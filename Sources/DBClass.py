@@ -14,8 +14,9 @@ class DBClient:
     def Create_Database_Tables(self):
         # if not(os.path.isfile(os.path.join((os.path.dirname(__file__)), 'RedDataBase.db'))):
         self.cursor.execute("CREATE TABLE IF NOT EXISTS HostIDList (id integer primary key, DateEntryAdded text CURRENT_TIMESTAMP, Hostname TEXT type UNIQUE)")
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS HostDisks (id integer primary key, DateEntryAdded, Hostname, DriveID, SerialNumber, Model, HealthStatus, CapacityGB, CurrentTemperatureCelsius, MaximumTemperatureCelsius, Description, DiskDriveStatusReasons, FirmwareVersion, InterfaceSpeedMbps, InterfaceType, Location, MediaType, PowerOnHours, RotationalSpeedRpm, UncorrectedReadErrors, UncorrectedWriteErrors)")
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS HostSummary (id integer primary key, DateEntryAdded text CURRENT_TIMESTAMP, Hostname TEXT type UNIQUE, Model, SerialNumber, HPE Gen, CPU_Model, Management_IP, Management_Version, Number_Of_Proc, Number_of_Cores_per_proc, MultiThreading, RAM_in_GB, HostOS, HostOS_version)")
+        # self.cursor.execute("CREATE TABLE IF NOT EXISTS HostDisks (id integer primary key, DateEntryAdded, Hostname, DriveID, SerialNumber, Model, HealthStatus, CapacityGB, CurrentTemperatureCelsius, MaximumTemperatureCelsius, Description, DiskDriveStatusReasons, FirmwareVersion, InterfaceSpeedMbps, InterfaceType, Location, MediaType, PowerOnHours, RotationalSpeedRpm, UncorrectedReadErrors, UncorrectedWriteErrors)")
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS HostDisks (id integer primary key, DateEntryAdded, Hostname, HostID, DriveID, Name, HealthStatus, StatusIndicator, BlockSizeBytes, CapableSpeedGbs, NegotiatedSpeedGbs, FailurePredicted, HostspareType, MediaType, Model, Location, PredictedMediaLifeLeftPercent, Protocol, Revision, SerialNumber, WriteCacheEnabled)")
+        # self.cursor.execute("CREATE TABLE IF NOT EXISTS HostSummary (id integer primary key, DateEntryAdded text CURRENT_TIMESTAMP, Hostname TEXT type UNIQUE, Model, SerialNumber, HPE Gen, CPU_Model, Management_IP, Management_Version, Number_Of_Proc, Number_of_Cores_per_proc, MultiThreading, RAM_in_GB, HostOS, HostOS_version)")
         # self.cursor.execute("CREATE TABLE IF NOT EXISTS HostChassis (id integer primary key, DateEntryAdded)")
         # self.cursor.execute("CREATE TABLE IF NOT EXISTS HostBIOS (id integer primary key, DateEntryAdded)")
         # self.cursor.execute("CREATE TABLE IF NOT EXISTS HostSystem (id integer primary key, DateEntryAdded)")
@@ -58,13 +59,15 @@ class DBClient:
     # Returns the foreign key ID for the hostname from the HostIDList table.
     def Get_HostID(self, Hostname: str) -> str:
         self.cursor.execute("SELECT ID FROM HostIDList WHERE Hostname=?", [Hostname])
-        Test = self.cursor.fetchone()
-        return(Test[0])
+        HostIDReturn = self.cursor.fetchone()
+        return(HostIDReturn[0])
 
     def Write_DiskDatabase(self, DiskData: dict, Hostname: str):
         HostID = self.Get_HostID(Hostname)
-        InsertData = (Hostname, (HostID), (DiskData['SerialNumber']), (DiskData['Model']), (DiskData['Status']['Health']), (DiskData['CapacityGB']), (DiskData['CurrentTemperatureCelsius']), (DiskData['MaximumTemperatureCelsius']), (DiskData['Description']), (''.join(str(x) for x in DiskData['DiskDriveStatusReasons'])), (DiskData['FirmwareVersion']['Current']['VersionString']), (DiskData['InterfaceSpeedMbps']), (DiskData['InterfaceType']), (DiskData['Location']), (DiskData['MediaType']), (DiskData['PowerOnHours']), (DiskData['RotationalSpeedRpm']), (DiskData['UncorrectedReadErrors']), (DiskData['UncorrectedWriteErrors']))
-        self.cursor.execute("INSERT INTO HostDisks(DateEntryAdded, Hostname, DriveID, SerialNumber, Model, HealthStatus, CapacityGB, CurrentTemperatureCelsius, MaximumTemperatureCelsius, Description, DiskDriveStatusReasons, FirmwareVersion, InterfaceSpeedMbps, InterfaceType, Location, MediaType, PowerOnHours, RotationalSpeedRpm, UncorrectedReadErrors, UncorrectedWriteErrors) VALUES (CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", InsertData)
+        # InsertData = (Hostname, (HostID), (DiskData['SerialNumber']), (DiskData['Model']), (DiskData['Status']['Health']), (DiskData['CapacityGB']), (DiskData['CurrentTemperatureCelsius']), (DiskData['MaximumTemperatureCelsius']), (DiskData['Description']), (''.join(str(x) for x in DiskData['DiskDriveStatusReasons'])), (DiskData['FirmwareVersion']['Current']['VersionString']), (DiskData['InterfaceSpeedMbps']), (DiskData['InterfaceType']), (DiskData['Location']), (DiskData['MediaType']), (DiskData['PowerOnHours']), (DiskData['RotationalSpeedRpm']), (DiskData['UncorrectedReadErrors']), (DiskData['UncorrectedWriteErrors']))
+        InsertData = (Hostname, (HostID), (DiskData['Id']), (DiskData['Name']), (DiskData['Status']['Health']),(DiskData['StatusIndicator']), (DiskData['BlockSizeBytes']), (DiskData['CapableSpeedGbs']), (DiskData['NegotiatedSpeedGbs']), (DiskData['FailurePredicted']), (DiskData['HotspareType']), (DiskData['MediaType']), (DiskData['Model']), (DiskData['PhysicalLocation']['PartLocation']['ServiceLabel']), (DiskData['PredictedMediaLifeLeftPercent']), (DiskData['Protocol']), (DiskData['Revision']), (DiskData['SerialNumber']), (DiskData['WriteCacheEnabled'])) 
+        # self.cursor.execute("INSERT INTO HostDisks(DateEntryAdded, Hostname, DriveID, SerialNumber, Model, HealthStatus, CapacityGB, CurrentTemperatureCelsius, MaximumTemperatureCelsius, Description, DiskDriveStatusReasons, FirmwareVersion, InterfaceSpeedMbps, InterfaceType, Location, MediaType, PowerOnHours, RotationalSpeedRpm, UncorrectedReadErrors, UncorrectedWriteErrors) VALUES (CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", InsertData)
+        self.cursor.execute("INSERT INTO HostDisks(DateEntryAdded, Hostname, HostID, DriveID, Name, HealthStatus, StatusIndicator, BlockSizeBytes, CapableSpeedGbs, NegotiatedSpeedGbs, FailurePredicted, HostspareType, MediaType, Model, Location, PredictedMediaLifeLeftPercent, Protocol, Revision, SerialNumber, WriteCacheEnabled) VALUES (CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", InsertData)
         self.DBConnection.commit()
         
     def Write_SysInfo(self):
@@ -87,7 +90,7 @@ class DBClient:
     def Get_DiskDatabase(self, SearchMethod: str) -> str:
         print(type(SearchMethod))
         if(SearchMethod == 'Full'):
-            for row in self.DBConnection.execute("SELECT * FROM HostDisks ORDER BY DateEntryAdded DESC"):
+            for row in self.DBConnection.execute("SELECT * FROM HostDisks ORDER BY ID DESC"):
                 print(row)
             # Query = database.execute("SELECT * FROM HostDisks ORDER BY DateEntryAdded DESC")
         elif(SearchMethod == 'Hosts'):
@@ -102,5 +105,4 @@ class DBClient:
             print(row)
             
         self.cursor.execute("SELECT * FROM HostDisks WHERE DriveID=?", DiskID)
-        print(self.cursor.fetchall())
-        
+        return(self.cursor.fetchall())

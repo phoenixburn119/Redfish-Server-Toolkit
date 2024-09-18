@@ -3,7 +3,6 @@ from pathlib import Path
 import os
 from Sources.DBClass import *
 from Sources.RFClass import *
-from Sources.TKClass import *
 
 dirname = os.path.dirname(__file__)
 filename = os.path.join(dirname, 'Sources\ILOSourceSingleTest.csv')
@@ -43,9 +42,7 @@ def MainTesting():
     #         HostList.append(ILOSheet.iloc[i,0])
     # DClient.Cleanup_Database_Tables(HostList)
 
-    UIClient = TKClient()
-    UIClient.tk_root.mainloop()
-    
+
     # FClient = RFClient()
     # FClient.Gather_HostDisks()
     pass

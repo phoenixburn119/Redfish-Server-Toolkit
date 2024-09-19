@@ -1,6 +1,5 @@
 from Sources.TKClass import *
 
-
 def main():
     UIClient = TKClient()
     UIClient.mainloop()

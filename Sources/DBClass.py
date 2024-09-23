@@ -13,10 +13,10 @@ class DBClient:
 
     def Create_Database_Tables(self):
         # if not(os.path.isfile(os.path.join((os.path.dirname(__file__)), 'RedDataBase.db'))):
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS HostIDList (id integer primary key, DateEntryAdded text CURRENT_TIMESTAMP, Hostname TEXT type UNIQUE)")
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS HostIDList (id integer primary key, DateEntryAdded text default CURRENT_TIMESTAMP, Hostname TEXT type UNIQUE)")
         # self.cursor.execute("CREATE TABLE IF NOT EXISTS HostDisks (id integer primary key, DateEntryAdded, Hostname, DriveID, SerialNumber, Model, HealthStatus, CapacityGB, CurrentTemperatureCelsius, MaximumTemperatureCelsius, Description, DiskDriveStatusReasons, FirmwareVersion, InterfaceSpeedMbps, InterfaceType, Location, MediaType, PowerOnHours, RotationalSpeedRpm, UncorrectedReadErrors, UncorrectedWriteErrors)")
         self.cursor.execute("CREATE TABLE IF NOT EXISTS HostDisks (id integer primary key, DateEntryAdded, Hostname, HostID, DriveID, Name, HealthStatus, StatusIndicator, BlockSizeBytes, CapableSpeedGbs, NegotiatedSpeedGbs, FailurePredicted, HostspareType, MediaType, Model, Location, PredictedMediaLifeLeftPercent, Protocol, Revision, SerialNumber, WriteCacheEnabled)")
-        # self.cursor.execute("CREATE TABLE IF NOT EXISTS HostSummary (id integer primary key, DateEntryAdded text CURRENT_TIMESTAMP, Hostname TEXT type UNIQUE, Model, SerialNumber, HPE Gen, CPU_Model, Management_IP, Management_Version, Number_Of_Proc, Number_of_Cores_per_proc, MultiThreading, RAM_in_GB, HostOS, HostOS_version)")
+        # self.cursor.execute("CREATE TABLE IF NOT EXISTS HostSummary (id integer primary key, DateEntryAdded text default CURRENT_TIMESTAMP, Hostname TEXT type UNIQUE, Model, SerialNumber, HPE Gen, CPU_Model, Management_IP, Management_Version, Number_Of_Proc, Number_of_Cores_per_proc, MultiThreading, RAM_in_GB, HostOS, HostOS_version)")
         # self.cursor.execute("CREATE TABLE IF NOT EXISTS HostChassis (id integer primary key, DateEntryAdded)")
         # self.cursor.execute("CREATE TABLE IF NOT EXISTS HostBIOS (id integer primary key, DateEntryAdded)")
         # self.cursor.execute("CREATE TABLE IF NOT EXISTS HostSystem (id integer primary key, DateEntryAdded)")

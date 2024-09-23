@@ -9,7 +9,7 @@ class TKClient(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Redfish-Server-Toolkit")
-        self.geometry('750x600')
+        self.geometry('850x600')
         self.config(background = "grey")
         self.columnconfigure(0, weight=1)
         # self.rowconfigure(0, weight=1)
@@ -20,10 +20,10 @@ class TKClient(tk.Tk):
         menu_bar.grid(row=0, column=0, sticky="ew")
         menu_bar.columnconfigure(0, weight=2)
         menu_bar.columnconfigure(1, weight=1)
-        home_button = ttk.Button(menu_bar, text="Home", command=lambda : self.show_frame())
-        host_button = ttk.Button(menu_bar, text="Hosts", command=lambda : self.show_frame(ListHostsFrame))
-        first_button = ttk.Button(menu_bar, text="Input Form", command=lambda : self.show_frame(InputForm))
-        options_button = ttk.Button(menu_bar, text="Options", command=lambda : self.show_frame(OptionsFrame))
+        home_button = ttk.Button(menu_bar, text="Home", command=lambda: self.show_frame())
+        host_button = ttk.Button(menu_bar, text="Hosts", command=lambda: self.show_frame(ListHostsFrame))
+        first_button = ttk.Button(menu_bar, text="Disk Logs", command=lambda: self.show_frame(DiskSearchFrame))
+        options_button = ttk.Button(menu_bar, text="Options", command=lambda: self.show_frame(OptionsFrame))
         home_button.grid(row=0, column=2)
         host_button.grid(row=0, column=3)
         first_button.grid(row=0, column=4)
@@ -37,8 +37,8 @@ class TKClient(tk.Tk):
   
         self.frames = {}
   
-        for F in (ListHostsFrame, InputForm, OptionsFrame):
-            frame = F(container, self)
+        for F in (ListHostsFrame, DiskSearchFrame, OptionsFrame):
+            frame = F(container) # this passes 3 parameters f(self), container, self. The self is redundant and links to "controller" that isnt used.
             self.frames[F] = frame 
             frame.grid(row = 0, column = 0, sticky ="nsew")
   
@@ -46,31 +46,64 @@ class TKClient(tk.Tk):
   
     def show_frame(self, cont):
         frame = self.frames[cont]
-        frame.tkraise() 
-        
-class InputForm(ttk.Frame):
-    def __init__(self, parent, controller):
-            super().__init__(parent)
-            self.entry_field = ttk.Entry(self)
-            self.entry_field.grid(row=0, column=0, sticky="ew")
-            self.entry_field.bind("<Return>", self.add_to_list)
-            
-            self.entry_button = ttk.Button(self, text="Add", command=self.add_to_list)
-            self.entry_button.grid(row=0,column=1)
-            
-            self.text_list = tk.Listbox(self)
-            self.text_list.grid(row=1, column=0, columnspan=2, sticky="nsew")
-            
-    def add_to_list(self, event=None):
-        text = self.entry_field.get()
-        if text:
-            self.text_list.insert(tk.END, text)
-            self.entry_field.delete(0, tk.END)
+        frame.tkraise()
 
-class OptionsFrame(ttk.Frame):
-        def __init__(self, parent, controller):
+class DiskSearchFrame(ttk.Frame):
+        def __init__(self, parent):
             super().__init__(parent)
             self.columnconfigure(0, weight=1)
+            # self.columnconfigure(1, weight=1)
+            DBQuery = UIDBClient()
+            
+            host_options = DBQuery.Get_HostsList()
+            host_options.insert(0, "Select Host")
+            defaultoption = tk.StringVar()
+            host_dropdown = ttk.OptionMenu(self, defaultoption, *host_options)
+            host_dropdown.grid(row=0, column=0, sticky="ew")
+            
+            # Button used to initialize search.
+            search_button = ttk.Button(self, text="Search Logs", command=lambda: self.GetTKDiskLogs((defaultoption.get())))
+            search_button.grid(row=0, column=5, sticky="ew")
+            
+            # Adds the list of disk information. (Bad naming)
+            self.hosts_list = tk.Listbox(self, height=18)
+            self.hosts_list.grid(row=1, column=0, sticky="ew", pady=5, columnspan=2)
+            self.hosts_list.insert(tk.END, "Search for hosts now")
+            
+            HeaderInfo = DBQuery.Get_TableHeaders("HostDisks")
+            self.diskdetails_list = tk.Listbox(self, height=18, selectmode="multiple")
+            self.diskdetails_list.grid(row=1, column=5, sticky="nsew", pady=5)
+            yscrollbar= tk.Scrollbar(self)
+            yscrollbar.grid(row=1, column=6, sticky="ns")
+            yscrollbar.config(command=self.diskdetails_list.yview)
+            for d in HeaderInfo:
+                self.diskdetails_list.insert(tk.END, d)
+            
+            disk_table = ttk.Treeview(self, columns=HeaderInfo)
+            disk_table.grid(row=2 ,column=0)
+
+        def Get_DiskDetails_Selection(self):
+            CurrentSelection = self.diskdetails_list.curselection()
+            SelectList = []
+            for index in CurrentSelection:
+                SelectList.append(self.diskdetails_list.get(index))
+            return(tuple(SelectList))
+
+        def GetTKDiskLogs(self, hostname):
+            DBQuery = UIDBClient()
+            # HeaderInfo = DBQuery.Get_TableHeaders("HostDisks")
+            DiskDataLogs = DBQuery.Get_DiskLogs(hostname, self.Get_DiskDetails_Selection())
+            self.hosts_list.delete(0, tk.END)
+            # self.hosts_list.insert(tk.END, HeaderInfo)
+            if DiskDataLogs:
+                for H in DiskDataLogs:
+                    self.hosts_list.insert(tk.END, H)
+
+class OptionsFrame(ttk.Frame):
+        def __init__(self, parent):
+            super().__init__(parent)
+            self.columnconfigure(0, weight=3)
+            self.columnconfigure(1, weight=1)
             # self.rowconfigure(0, weight=1)
             path_button = ttk.Button(self, text="Select DB", command=self.file_select)
             path_button.grid(row=0, column=0, columnspan=2, sticky="ew")
@@ -95,13 +128,13 @@ class OptionsFrame(ttk.Frame):
                 pass
             
 class ListHostsFrame(ttk.Frame):
-        def __init__(self, parent, controller):
+        def __init__(self, parent):
             super().__init__(parent)
             self.columnconfigure(0, weight=1)
             
-            search_button = ttk.Button(self, text="Search For Hosts", command=lambda : self.GetHosts())
+            search_button = ttk.Button(self, text="Search For Hosts", command=lambda: self.GetHosts())
             search_button.grid(row=0, column=0, sticky="ew")
-            self.hosts_list = tk.Listbox(self, height=2)
+            self.hosts_list = tk.Listbox(self, height=8)
             self.hosts_list.grid(row=1, column=0, sticky="ew")
             self.hosts_list.insert(tk.END, "Search for hosts now")
 
@@ -115,6 +148,4 @@ class ListHostsFrame(ttk.Frame):
             if Hosts:
                 for H in Hosts:
                     self.hosts_list.insert(tk.END, H)
-                    pass
-            
             

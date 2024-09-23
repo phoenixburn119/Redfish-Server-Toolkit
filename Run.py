@@ -5,7 +5,7 @@ from Sources.DBClass import *
 from Sources.RFClass import *
 
 dirname = os.path.dirname(__file__)
-filename = os.path.join(dirname, 'Sources\ILOSourceSingleTest.csv')
+filename = os.path.join(dirname, 'Sources\ILOSource.csv')
 ILOSheet = pd.read_csv(filename)
 
 def Main():
@@ -50,6 +50,6 @@ def MainTesting():
 
 
 if __name__ == "__main__":
-    # Main()
-    MainTesting()
+    Main()
+    # MainTesting()
     # pass

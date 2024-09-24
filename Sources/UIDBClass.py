@@ -40,11 +40,11 @@ class UIDBClient:
     def Get_HostID(self, Hostname: str) -> str:
         self.cursor.execute("SELECT ID FROM HostIDList WHERE Hostname=?", [Hostname])
         HostIDReturn = self.cursor.fetchone()
-        return(HostIDReturn[0])
+        return HostIDReturn[0]
     
     def Get_HostsList(self) -> str:  
         self.cursor.execute("SELECT Hostname FROM HostIDList")
-        return(self.cursor.fetchall())
+        return self.cursor.fetchall()
     
     def Get_DiskLogs(self, hostname: str) -> list[HostDisk]:
         hostID = self.Get_HostID(hostname)

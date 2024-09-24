@@ -1,5 +1,30 @@
 import os
 import sqlite3
+from dataclasses import dataclass
+
+@dataclass
+class HostDisk():
+    id: int
+    DateEntryAdded: str
+    Hostname: str
+    HostID: str
+    DriveID: str
+    Name: str
+    HealthStatus: str
+    StatusIndicator: str
+    BlockSizeBytes: str
+    CapableSpeedGbs: str
+    NegotiatedSpeedGbs: str
+    FailurePredicted: str
+    HostspareType: str
+    MediaType: str
+    Model: str
+    Location: str
+    PredictedMediaLifeLeftPercent: str
+    Protocol: str
+    Revision: str
+    SerialNumber: str
+    WriteCacheEnabled: str
 
 class UIDBClient:
     DBConnection = None
@@ -21,30 +46,17 @@ class UIDBClient:
         self.cursor.execute("SELECT Hostname FROM HostIDList")
         return(self.cursor.fetchall())
     
-    def Get_DiskLogs(self, hostname: str, QueryList: tuple) -> str:
+    def Get_DiskLogs(self, hostname: str) -> list[HostDisk]:
         hostID = self.Get_HostID(hostname)
-        # QueryReturn = self.DBConnection.execute("SELECT * FROM HostDisks WHERE HostID=?", [hostID])
-        print(type(QueryList))
-        print(QueryList)
-        # data = [QueryList, hostID]
-        # print(data)
-        # QueryReturn2 = self.DBConnection.execute("SELECT ? FROM HostDisks WHERE HostID=1", [QueryList])
-        # for f in QueryReturn2:
-        #     print(f)
-            
-        # sql = 'SELECT (%s) FROM HostDisks' % ', '.join('?' for a in QueryList)
-        # self.cursor.execute(sql, QueryList)
-        
-        str1 = "SELECT "
-        for fieldname in QueryList:
-            str1 = str1 + fieldname + ", "
+        query_return = self.DBConnection.execute("SELECT * FROM HostDisks WHERE HostID=?", [hostID])
+        hosts = []
+        for host in query_return:
+            h = HostDisk(host[0], host[1], host[2], host[3], host[4], host[5], host[6],
+                         host[7], host[8], host[9], host[10], host[11], host[12], host[13],
+                         host[14], host[15], host[16], host[17], host[18], host[19], host[20])
+            hosts.append(h)
+        return hosts
 
-        select_query_string = str1[0:-2] + " from " +'HostDisk'
-        query=(select_query_string)
-        
-        
-        # return(QueryReturn.fetchall())
-    
     def Get_TableHeaders(self, TableName):
         # test = self.cursor.execute("SELECT sql FROM sqlite_master WHERE name=?", [TableName])
         test = self.cursor.execute(f"SELECT * FROM {TableName}")
@@ -53,10 +65,9 @@ class UIDBClient:
         for row in test.description:
             HeaderList.append(row[0])
         return(HeaderList)
-            
-        
-        
-        
+
+
+
 def main():
     Client = UIDBClient()
     test = ['Hostname', 'HostID', 'DriveID', 'Name', 'HealthStatus']

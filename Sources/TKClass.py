@@ -87,17 +87,21 @@ class DiskSearchFrame(ttk.Frame):
             SelectList = []
             for index in CurrentSelection:
                 SelectList.append(self.diskdetails_list.get(index))
-            return(tuple(SelectList))
+            return(SelectList)
 
         def GetTKDiskLogs(self, hostname):
             DBQuery = UIDBClient()
             # HeaderInfo = DBQuery.Get_TableHeaders("HostDisks")
-            DiskDataLogs = DBQuery.Get_DiskLogs(hostname, self.Get_DiskDetails_Selection())
+            disk_data_logs = DBQuery.Get_DiskLogs(hostname)
             self.hosts_list.delete(0, tk.END)
             # self.hosts_list.insert(tk.END, HeaderInfo)
-            if DiskDataLogs:
-                for H in DiskDataLogs:
-                    self.hosts_list.insert(tk.END, H)
+            column_selection = self.Get_DiskDetails_Selection()
+            if disk_data_logs:
+                for H in disk_data_logs:
+                    data = []
+                    for L in column_selection:
+                        data.append(str(getattr(H, L)))
+                    self.hosts_list.insert(tk.END, ', '.join(data))
 
 class OptionsFrame(ttk.Frame):
         def __init__(self, parent):
@@ -138,8 +142,6 @@ class ListHostsFrame(ttk.Frame):
             self.hosts_list.grid(row=1, column=0, sticky="ew")
             self.hosts_list.insert(tk.END, "Search for hosts now")
 
-            
-            
         def GetHosts(self):
             DBQuery = UIDBClient()
             Hosts = DBQuery.Get_HostsList()

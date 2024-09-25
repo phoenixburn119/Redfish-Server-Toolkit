@@ -29,22 +29,6 @@ def Main():
 
 
 def MainTesting():
-    # DClient = DBClient()
-    # DClient.Get_DiskDatabase('Hosts')
-    # DClient.Get_DiskDatabase('Full')
-    # DClient.Get_DiskByID('3')
-    
-    # print(DClient.Get_HostID('facebookesx01ilo.sto.com'))
-    
-    # HostList = []
-    # for i in range(ILOSheet.iloc[:,1].count()):
-    #     if(ILOSheet.iloc[i,0] != "Hostname"):
-    #         HostList.append(ILOSheet.iloc[i,0])
-    # DClient.Cleanup_Database_Tables(HostList)
-
-
-    # FClient = RFClient()
-    # FClient.Gather_HostDisks()
     pass
 
 

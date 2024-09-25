@@ -78,18 +78,18 @@ class DiskSearchFrame(ttk.Frame):
         search_button = ttk.Button(
             self,
             text="Search Logs",
-            command=lambda: self.GetTKDiskLogs(defaultoption.get())
-            # command=lambda: self.DrawLogFrame(log_frame, 5, (len(self.Get_DiskDetails_Selection())))
+            command=lambda: self.GetTKDiskLogs(defaultoption.get(), log_frame)
+            # command=lambda: self.DrawLogFrame(log_frame, self.Get_DiskDetails_Selection(), 'test')
         )
         search_button.grid(row=0, column=5, sticky="ew")
 
         # Adds the list of disk information. (Bad naming)
-        self.hosts_list = tk.Listbox(self, height=18)
+        self.hosts_list = tk.Listbox(self, height=20)
         self.hosts_list.grid(row=1, column=0, sticky="ew", pady=5, columnspan=2)
         self.hosts_list.insert(tk.END, "Search for hosts now")
 
         HeaderInfo = DBQuery.Get_TableHeaders("HostDisks")
-        self.diskdetails_list = tk.Listbox(self, height=18, selectmode="multiple")
+        self.diskdetails_list = tk.Listbox(self, height=20, selectmode="multiple")
         self.diskdetails_list.grid(row=1, column=5, sticky="nsew", pady=5)
         yscrollbar = tk.Scrollbar(self)
         yscrollbar.grid(row=1, column=6, sticky="ns")
@@ -98,11 +98,21 @@ class DiskSearchFrame(ttk.Frame):
             self.diskdetails_list.insert(tk.END, d)
 
     # WIP trying to redraw the log table depending on disk details selection.
-    def DrawLogFrame(self, cont, row, column):
-        disk_table = ttk.Treeview(cont, columns=column)
-        disk_table.grid(row=0, column=0)
-        f = disk_table
-        f.tkraise()
+    def DrawLogFrame(self, cont, headings):
+        try:
+            if 1 == (self.disk_table.winfo_exists()):
+                self.disk_table.destroy()
+            elif (self.disk_table.winfo_exists() == 0):
+                print("No Table")
+        except:
+            pass
+        self.disk_table = ttk.Treeview(cont, columns=headings, show='headings')
+        self.disk_table.grid(row=0, column=0, sticky='ew')
+
+        for H in headings: # Creates all the headings for the table.
+            self.disk_table.heading(H, text=H)
+        for D in (): # Loads table data into the treeview widget.
+            pass
 
     def Get_DiskDetails_Selection(self):
         SelectList = []
@@ -110,19 +120,21 @@ class DiskSearchFrame(ttk.Frame):
             SelectList.append(self.diskdetails_list.get(index))
         return SelectList
 
-    def GetTKDiskLogs(self, hostname):
+    def GetTKDiskLogs(self, hostname, log_frame):
         DBQuery = UIDBClient()
         # HeaderInfo = DBQuery.Get_TableHeaders("HostDisks")
         disk_data_logs = DBQuery.Get_DiskLogs(hostname)
         self.hosts_list.delete(0, tk.END)
         # self.hosts_list.insert(tk.END, HeaderInfo)
         column_selection = self.Get_DiskDetails_Selection()
+        self.DrawLogFrame(log_frame, self.Get_DiskDetails_Selection())
         if disk_data_logs:
             for H in disk_data_logs:
                 data = []
                 for L in column_selection:
                     data.append(str(getattr(H, L)))
                 self.hosts_list.insert(tk.END, ", ".join(data))
+                self.disk_table.insert('', tk.END, values=data)
 
 
 class OptionsFrame(ttk.Frame):
@@ -153,6 +165,7 @@ class OptionsFrame(ttk.Frame):
             self.path_list.insert(tk.END, my_file)
         else:
             pass
+        
 
 
 class ListHostsFrame(ttk.Frame):

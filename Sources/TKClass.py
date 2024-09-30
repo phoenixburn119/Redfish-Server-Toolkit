@@ -12,9 +12,10 @@ class TKClient(tk.Tk):
         self.title("Redfish-Server-Toolkit")
         self.geometry("850x600")
         self.config(background="grey")
+        # self.grid(self, )
         self.columnconfigure(0, weight=1)
         # self.rowconfigure(0, weight=1)
-        # self.columnconfigure(1, weight=1)
+        # self.columnconfigure(1, weight=3)
         # self.rowconfigure(1, weight=1)
 
         menu_bar = ttk.Frame(self)
@@ -62,37 +63,34 @@ class TKClient(tk.Tk):
 class DiskSearchFrame(ttk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
-        self.columnconfigure(0, weight=1)
-        # self.columnconfigure(1, weight=1)
+        self.grid(sticky="nsew")
+        # self.columnconfigure(0, weight=1)
+        # self.columnconfigure(1, weight=3)
         DBQuery = UIDBClient()
         log_frame = ttk.Frame(self)
-        log_frame.grid(row=2, column=0, sticky="ew")
+        log_frame.grid(row=12, column=0, sticky="nsew", columnspan=24)
+        # log_frame.columnconfigure(0, weight=1)
+        # log_frame.columnconfigure(1, weight=4)
 
         host_options = DBQuery.Get_HostsList()
         host_options.insert(0, "Select Host")
         defaultoption = tk.StringVar()
         host_dropdown = ttk.OptionMenu(self, defaultoption, *host_options)
-        host_dropdown.grid(row=0, column=0, sticky="ew")
+        host_dropdown.grid(row=1, column=2, sticky="ew")
 
         # Button used to initialize search.
         search_button = ttk.Button(
             self,
             text="Search Logs",
             command=lambda: self.GetTKDiskLogs(defaultoption.get(), log_frame)
-            # command=lambda: self.DrawLogFrame(log_frame, self.Get_DiskDetails_Selection(), 'test')
         )
-        search_button.grid(row=0, column=5, sticky="ew")
-
-        # Adds the list of disk information. (Bad naming)
-        self.hosts_list = tk.Listbox(self, height=20)
-        self.hosts_list.grid(row=1, column=0, sticky="ew", pady=5, columnspan=2)
-        self.hosts_list.insert(tk.END, "Search for hosts now")
+        search_button.grid(row=0, column=2, sticky="ew")
 
         HeaderInfo = DBQuery.Get_TableHeaders("HostDisks")
-        self.diskdetails_list = tk.Listbox(self, height=20, selectmode="multiple")
-        self.diskdetails_list.grid(row=1, column=5, sticky="nsew", pady=5)
+        self.diskdetails_list = tk.Listbox(self, height=12, selectmode="multiple")
+        self.diskdetails_list.grid(row=0, column=0, sticky="nsew", pady=5, rowspan= 12)
         yscrollbar = tk.Scrollbar(self)
-        yscrollbar.grid(row=1, column=6, sticky="ns")
+        yscrollbar.grid(row=0, column=1, sticky="ns")
         yscrollbar.config(command=self.diskdetails_list.yview)
         for d in HeaderInfo:
             self.diskdetails_list.insert(tk.END, d)
@@ -106,13 +104,13 @@ class DiskSearchFrame(ttk.Frame):
                 print("No Table")
         except:
             pass
-        self.disk_table = ttk.Treeview(cont, columns=headings, show='headings')
-        self.disk_table.grid(row=0, column=0, sticky='ew')
+        self.disk_table = ttk.Treeview(cont, columns=headings, show='headings', selectmode='browse')
+        
+        self.disk_table.grid(row=1, column=0, sticky='nsew')
 
         for H in headings: # Creates all the headings for the table.
             self.disk_table.heading(H, text=H)
-        for D in (): # Loads table data into the treeview widget.
-            pass
+            self.disk_table.column(H, width=len(H)*8)
 
     def Get_DiskDetails_Selection(self):
         SelectList = []
@@ -124,7 +122,7 @@ class DiskSearchFrame(ttk.Frame):
         DBQuery = UIDBClient()
         # HeaderInfo = DBQuery.Get_TableHeaders("HostDisks")
         disk_data_logs = DBQuery.Get_DiskLogs(hostname)
-        self.hosts_list.delete(0, tk.END)
+        # self.hosts_list.delete(0, tk.END)
         # self.hosts_list.insert(tk.END, HeaderInfo)
         column_selection = self.Get_DiskDetails_Selection()
         self.DrawLogFrame(log_frame, self.Get_DiskDetails_Selection())
@@ -133,7 +131,7 @@ class DiskSearchFrame(ttk.Frame):
                 data = []
                 for L in column_selection:
                     data.append(str(getattr(H, L)))
-                self.hosts_list.insert(tk.END, ", ".join(data))
+                # self.hosts_list.insert(tk.END, ", ".join(data))
                 self.disk_table.insert('', tk.END, values=data)
 
 
